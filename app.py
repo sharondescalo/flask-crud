@@ -36,12 +36,22 @@ def add_team():
 
 
 # route to update team with PUT method
-@app.route('/teams/<int:id>', methods=['PUT'])
+@app.route('/teams/<int:xid>', methods=['PUT'])
 def update_team(xid):
     '''Function to edit team in our database using team id'''
     request_data = request.get_json()
-    Team.update_team(xid, request_data['quota'])
-    response = Response("Team Updated", status=200, mimetype='application/json')
+    append = request_data['machine_id']
+    if append is None:
+        Team.update_team(xid, request_data['quota'])
+        response = Response("Team Updated", status=200, mimetype='application/json')
+    else:
+        # append machine to team Only.
+        res = Team.append_machine_to_team_by_id(xid,request_data['machine_id'])
+        if res == True:
+            response = Response("Machine Successfuly appended to the Team", status=200, mimetype='application/json')
+        else:
+            response = Response("Failed to appended to the Team", status=200, mimetype='application/json')
+
     return response
 
 
@@ -53,12 +63,16 @@ def remove_team(xid):
     response = Response("Team Deleted", status=200, mimetype='application/json')
     return response
 
+
 #----------------------------------------------------
 #----------------------------------------------------
 
 # route to get all machines
 @app.route('/machines', methods=['GET'])
-def get_machines():
+def get_machines(
+
+
+):
     '''Function to get all the machines in the database'''
     return jsonify({'Machines': Machine.get_all_machines()})
 
@@ -85,7 +99,7 @@ def add_machine():
 def update_machine(xid):
     '''Function to edit machine in our database using team id'''
     request_data = request.get_json()
-    Machine.update_machine(xid, request_data['name'], request_data['team_id'])
+    Machine.update_machine(xid, request_data['name'])
     response = Response("Machine Updated", status=200, mimetype='application/json')
     return response
 
